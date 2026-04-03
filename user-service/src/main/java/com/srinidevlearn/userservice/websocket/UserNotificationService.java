@@ -36,7 +36,7 @@ public class UserNotificationService {
 
     public void notifySpecificUser(String userId, NotificationMessage notification) {
         logger.info("Sending private notification to user {}: {}", userId, notification.getMessage());
-        messagingTemplate.convertAndSend("/queue/user/" + userId, notification);
+        messagingTemplate.convertAndSendToUser(userId, "/queue/notifications", notification);
     }
 
     public record UserPayload(String userId, String userName) {}

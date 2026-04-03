@@ -60,7 +60,7 @@ class UserNotificationServiceTest {
     }
 
     @Test
-    @DisplayName("notifySpecificUser should send to user-specific queue")
+    @DisplayName("notifySpecificUser should send to user-specific queue via convertAndSendToUser")
     void notifySpecificUser_shouldSendToUserQueue() {
         // Arrange
         String userId = "42";
@@ -71,6 +71,6 @@ class UserNotificationServiceTest {
 
         // Assert
         verify(messagingTemplate, times(1))
-                .convertAndSend(eq("/queue/user/42"), eq(notification));
+                .convertAndSendToUser(eq("42"), eq("/queue/notifications"), eq(notification));
     }
 }
