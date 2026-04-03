@@ -4,6 +4,29 @@ server:
 spring:
   application:
     name: user-service
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/microservices_db}
+  cloud:
+    stream:
+      binders:
+        solace:
+          type: solace
+          environment:
+            solace:
+              java:
+                host: ${SOLACE_HOST:tcp://localhost:55555}
+                msgVpn: ${SOLACE_VPN:default}
+                clientUsername: ${SOLACE_USERNAME:default}
+                clientPassword: ${SOLACE_PASSWORD:}
+      bindings:
+        userEvents-out-0:
+          destination: user/events
+          binder: solace
+        userEventListener-in-0:
+          destination: user/events
+          binder: solace
+          group: user-service-group
 
 eureka:
   client:

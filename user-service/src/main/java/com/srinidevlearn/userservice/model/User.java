@@ -1,8 +1,13 @@
 package com.srinidevlearn.userservice.model;
 
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "users")
 public class User {
 
-    private Long id;
+    @Id
+    private String id;
     private String name;
     private String email;
     private String role;
@@ -10,18 +15,18 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String name, String email, String role) {
+    public User(String id, String name, String email, String role) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.role = role;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

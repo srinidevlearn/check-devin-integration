@@ -1,48 +1,44 @@
 package com.srinidevlearn.userservice.service;
 
+import com.srinidevlearn.userservice.event.UserEventPublisher;
 import com.srinidevlearn.userservice.model.User;
+import com.srinidevlearn.userservice.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import jakarta.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
 
-    private final List<User> users = new ArrayList<>();
+    private final UserRepository userRepository;
+    private final UserEventPublisher userEventPublisher;
 
-    @PostConstruct
-    public void init() {
-        users.add(new User(1L, "Alice Johnson", "alice@example.com", "ADMIN"));
-        users.add(new User(2L, "Bob Smith", "bob@example.com", "USER"));
-        users.add(new User(3L, "Charlie Brown", "charlie@example.com", "USER"));
+    public UserService(UserRepository userRepository, UserEventPublisher userEventPublisher) {
+        this.userRepository = userRepository;
+        this.userEventPublisher = userEventPublisher;
     }
 
     public List<User> getAllUsers() {
-        return users;
+        return userRepository.findAll();
     }
 
-    public Optional<User> getUserById(Long id) {
-        return users.stream()
-                .filter(user -> user.getId().equals(id))
-                .findFirst();
+    public Optional<User> getUserById(String id) {
+        return userRepository.findById(id);
     }
 
     public User createUser(User user) {
-        Long nextId = users.stream()
-                .mapToLong(User::getId)
-                .max()
-                .orElse(0L) + 1;
-        user.setId(nextId);
-        users.add(user);
-        return user;
+        User saved = userRepository.save(user);
+        userEventPublisher.publishUserCreated(saved.getId(), saved.getName(), saved.getEmail());
+        return saved;
     }
 
-    public Optional<User> deleteUser(Long id) {
-        Optional<User> user = getUserById(id);
-        user.ifPresent(users::remove);
+    public Optional<User> deleteUser(String id) {
+        Optional<User> user = userRepository.findById(id);
+        user.ifPresent(u -> {
+            userRepository.deleteById(id);
+            userEventPublisher.publishUserDeleted(u.getId(), u.getName(), u.getEmail());
+        });
         return user;
     }
 }

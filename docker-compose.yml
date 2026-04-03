@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  solace:
+    image: solace/solace-pubsub-standard:latest
+    container_name: solace-pubsub
+    hostname: solace
+    ports:
+      - "8008:8008"   # Web Transport
+      - "55555:55555" # SMF
+      - "55003:55003" # SMF Compressed
+      - "55443:55443" # SMF over TLS
+      - "8443:8443"   # SEMP over TLS
+      - "943:943"     # SEMP over TLS
+      - "80:80"       # Web Transport
+      - "9000:9000"   # REST
+      - "8741:8741"   # MQTT Default VPN
+    environment:
+      - username_admin_globalaccesslevel=admin
+      - username_admin_password=admin
+      - system_scaling_maxconnectioncount=100
+    shm_size: 1g
+    ulimits:
+      core: -1
+      nofile:
+        soft: 2448
+        hard: 6592
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 1
