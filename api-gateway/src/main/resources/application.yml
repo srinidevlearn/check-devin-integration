@@ -10,10 +10,6 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
-      default-filters:
-        - name: RequestRateLimiter
-          args:
-            deny-empty-key: false
 
 eureka:
   client:
