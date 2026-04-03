@@ -1,0 +1,6 @@
+rootProject.name = 'microservices-parent'
+
+include 'eureka-server'
+include 'api-gateway'
+include 'user-service'
+include 'product-service'
