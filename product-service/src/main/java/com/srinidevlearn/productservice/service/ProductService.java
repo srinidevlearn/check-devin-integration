@@ -3,6 +3,7 @@ package com.srinidevlearn.productservice.service;
 import com.srinidevlearn.productservice.event.ProductEventPublisher;
 import com.srinidevlearn.productservice.model.Product;
 import com.srinidevlearn.productservice.repository.ProductRepository;
+import com.srinidevlearn.productservice.websocket.ProductNotificationService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,10 +14,13 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final ProductEventPublisher productEventPublisher;
+    private final ProductNotificationService productNotificationService;
 
-    public ProductService(ProductRepository productRepository, ProductEventPublisher productEventPublisher) {
+    public ProductService(ProductRepository productRepository, ProductEventPublisher productEventPublisher,
+                          ProductNotificationService productNotificationService) {
         this.productRepository = productRepository;
         this.productEventPublisher = productEventPublisher;
+        this.productNotificationService = productNotificationService;
     }
 
     public List<Product> getAllProducts() {
@@ -34,6 +38,7 @@ public class ProductService {
     public Product createProduct(Product product) {
         Product saved = productRepository.save(product);
         productEventPublisher.publishProductCreated(saved.getId(), saved.getName(), saved.getCategory());
+        productNotificationService.notifyProductCreated(saved.getId(), saved.getName());
         return saved;
     }
 
@@ -42,6 +47,7 @@ public class ProductService {
         product.ifPresent(p -> {
             productRepository.deleteById(id);
             productEventPublisher.publishProductDeleted(p.getId(), p.getName(), p.getCategory());
+            productNotificationService.notifyProductDeleted(p.getId(), p.getName());
         });
         return product;
     }

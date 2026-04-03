@@ -3,6 +3,7 @@ package com.srinidevlearn.userservice.service;
 import com.srinidevlearn.userservice.event.UserEventPublisher;
 import com.srinidevlearn.userservice.model.User;
 import com.srinidevlearn.userservice.repository.UserRepository;
+import com.srinidevlearn.userservice.websocket.UserNotificationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,9 @@ class UserServiceTest {
 
     @Mock
     private UserEventPublisher userEventPublisher;
+
+    @Mock
+    private UserNotificationService userNotificationService;
 
     @InjectMocks
     private UserService userService;
@@ -100,6 +104,8 @@ class UserServiceTest {
         verify(userRepository, times(1)).save(inputUser);
         verify(userEventPublisher, times(1))
                 .publishUserCreated("3", "Charlie", "charlie@example.com");
+        verify(userNotificationService, times(1))
+                .notifyUserCreated("3", "Charlie");
     }
 
     @Test
@@ -118,6 +124,8 @@ class UserServiceTest {
         verify(userRepository, times(1)).deleteById("1");
         verify(userEventPublisher, times(1))
                 .publishUserDeleted("1", "Alice", "alice@example.com");
+        verify(userNotificationService, times(1))
+                .notifyUserDeleted("1", "Alice");
     }
 
     @Test
@@ -133,5 +141,6 @@ class UserServiceTest {
         assertFalse(result.isPresent());
         verify(userRepository, never()).deleteById(any());
         verify(userEventPublisher, never()).publishUserDeleted(any(), any(), any());
+        verify(userNotificationService, never()).notifyUserDeleted(any(), any());
     }
 }
