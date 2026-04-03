@@ -3,6 +3,7 @@ package com.srinidevlearn.productservice.service;
 import com.srinidevlearn.productservice.event.ProductEventPublisher;
 import com.srinidevlearn.productservice.model.Product;
 import com.srinidevlearn.productservice.repository.ProductRepository;
+import com.srinidevlearn.productservice.websocket.ProductNotificationService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,9 @@ class ProductServiceTest {
 
     @Mock
     private ProductEventPublisher productEventPublisher;
+
+    @Mock
+    private ProductNotificationService productNotificationService;
 
     @InjectMocks
     private ProductService productService;
@@ -122,6 +126,8 @@ class ProductServiceTest {
         verify(productRepository, times(1)).save(inputProduct);
         verify(productEventPublisher, times(1))
                 .publishProductCreated("5", "Tablet", "Electronics");
+        verify(productNotificationService, times(1))
+                .notifyProductCreated("5", "Tablet");
     }
 
     @Test
@@ -141,6 +147,8 @@ class ProductServiceTest {
         verify(productRepository, times(1)).deleteById("1");
         verify(productEventPublisher, times(1))
                 .publishProductDeleted("1", "Laptop", "Electronics");
+        verify(productNotificationService, times(1))
+                .notifyProductDeleted("1", "Laptop");
     }
 
     @Test
@@ -156,5 +164,6 @@ class ProductServiceTest {
         assertFalse(result.isPresent());
         verify(productRepository, never()).deleteById(any());
         verify(productEventPublisher, never()).publishProductDeleted(any(), any(), any());
+        verify(productNotificationService, never()).notifyProductDeleted(any(), any());
     }
 }
